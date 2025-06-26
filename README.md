@@ -7,16 +7,16 @@ Automatically finds, downloads, organizes, and streams TV shows, movies, and mus
 
 ## 🧩 Included Containers
 
-| Service     | Purpose                              | Port    |
-|-------------|--------------------------------------|---------|
-| **Prowlarr** | Indexer manager for *Arr apps         | `9696`  |
-| **Sonarr**   | TV show management                    | `8989`  |
-| **Radarr**   | Movie management                      | `7878`  |
-| **Lidarr**   | Music management                      | `8686`  |
-| **Bazarr**   | Subtitles automation                  | `6767`  |
-| **Deluge**   | Torrent downloader                    | `8112` (Web UI) |
-| **Plex**     | Media playback & streaming server     | `32400` |
-| **Heimdall** | Web dashboard for quick access        | `80`    |
+| Service      | Purpose                           | Port            |
+| ------------ | --------------------------------- | --------------- |
+| **Prowlarr** | Indexer manager for \*Arr apps    | `9696`          |
+| **Sonarr**   | TV show management                | `8989`          |
+| **Radarr**   | Movie management                  | `7878`          |
+| **Lidarr**   | Music management                  | `8686`          |
+| **Bazarr**   | Subtitles automation              | `6767`          |
+| **Deluge**   | Torrent downloader                | `8112` (Web UI) |
+| **Plex**     | Media playback & streaming server | `32400`         |
+| **Heimdall** | Web dashboard for quick access    | `80`            |
 
 ---
 
@@ -70,7 +70,7 @@ Automatically finds, downloads, organizes, and streams TV shows, movies, and mus
 - [ ] Link Prowlarr to Sonarr, Radarr, Lidarr
 - [ ] Add working indexers (TorrentGalaxy, YTS, etc.)
 - [ ] Configure quality profiles and root folders
-- [ ] Connect Deluge to all *Arr apps
+- [ ] Connect Deluge to all \*Arr apps
 - [ ] Set up Plex libraries for `/tv`, `/movies`, `/music`
 - [ ] Add subtitle providers in Bazarr (e.g. OpenSubtitles, Subscene)
 - [ ] Customize Heimdall with links and logos
@@ -111,12 +111,6 @@ docker-compose down
 ```bash
 docker-compose down -v
 ```
-
----
-
-## 📸 Screenshots
-
-*(Optional: add screenshots of Heimdall or Plex UI here)*
 
 ---
 
