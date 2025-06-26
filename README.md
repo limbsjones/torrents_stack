@@ -48,8 +48,8 @@ Automatically finds, downloads, organizes, and streams TV shows, movies, and mus
 1. **Clone the repo:**
 
    ```bash
-   git clone https://github.com/yourusername/media-automation-stack.git
-   cd media-automation-stack
+   git clone https://github.com/limbsjones/torrents_stack
+   cd torrents_stack
    ```
 
 2. **Start all containers:**
