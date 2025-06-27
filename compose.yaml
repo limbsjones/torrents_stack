@@ -48,7 +48,7 @@ services:
 
   deluge:
     image: linuxserver/deluge
-    container_name: deluge
+    container_name: deluge_stack
     environment:
       - PUID=1000
       - PGID=1000
@@ -59,14 +59,14 @@ services:
       - /mnt/BIGBASTA/torrents:/downloads
     ports:
       - 8112:8112
-      - 6881:6881
+      - 6882:6882
       - 6881:6881/udp
       - 58846:58846 #optional
     restart: unless-stopped
 
   plex:
     image: lscr.io/linuxserver/plex:latest
-    container_name: plexx
+    container_name: plex
     ports:
       - "32400:32400"
     environment:
