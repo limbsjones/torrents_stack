@@ -35,7 +35,7 @@ services:
     ports:
       - 7878:7878
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      test: ["CMD", "curl", "-f", "http://localhost:7878"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -86,8 +86,8 @@ services:
       - PLEX_CLAIM=claim-vsoPvyeAwtrfxtXP49YR
     volumes:
       - /home/limbsjones/plex/config:/config
-      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
       - /mnt/BIGBASTA/jellyfin/TV:/shows
+      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
     restart: unless-stopped
 
   bazarr:
@@ -99,7 +99,6 @@ services:
       - TZ=America/Toronto
     volumes:
       - /home/limbsjones/bazarr/config:/config
-      - /mnt/BIGBASTA/jellyfin/TV:/shows
       - /mnt/BIGBASTA/jellyfin/Movies:/Movies
     ports:
       - 6767:6767
