@@ -1,0 +1,146 @@
+version: "3.8"
+
+services:
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/sonarr/config:/config
+      - /mnt/BIGBASTA/jellyfin/TV/:/tv
+      - /mnt/BIGBASTA/torrents:/downloads
+    ports:
+      - 8989:8989
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/radarr/config:/config
+      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+      - /mnt/BIGBASTA/torrents:/downloads
+    ports:
+      - 7878:7878
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/lidarr/config:/config
+      - /mnt/BIGBASTA/torrents:/downloads
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+
+  deluge:
+    image: linuxserver/deluge
+    container_name: deluge_stack
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DELUGE_LOGLEVEL=error #optional
+    volumes:
+      - /mnt/BIGBASTA/deluge:/config
+      - /mnt/BIGBASTA/torrents:/downloads
+    ports:
+      - 8112:8112
+      - 6882:6882
+      - 6881:6881/udp
+      - 58846:58846 #optional
+    restart: unless-stopped
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    ports:
+      - "32400:32400"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - VERSION=docker
+      - PLEX_CLAIM=claim-vsoPvyeAwtrfxtXP49YR
+    volumes:
+      - /home/limbsjones/plex/config:/config
+      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+      - /mnt/BIGBASTA/jellyfin/TV:/shows
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/bazarr/config:/config
+      - /mnt/BIGBASTA/jellyfin/TV:/shows
+      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/limbsjones/heimdall/config:/config
+    ports:
+      - 8080:80
+    restart: unless-stopped
+
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: proxy
+    restart: unless-stopped
+    ports:
+      - "80:80" # HTTP
+      - "81:81" # Web UI
+      - "443:443" # HTTPS
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"
+    volumes:
+      - /home/limbsjones/npm/data:/data
+      - /home/limbsjones/npm/letsencrypt:/etc/letsencrypt
