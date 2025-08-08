@@ -88,6 +88,15 @@ services:
       - /home/limbsjones/plex/config:/config
       - /mnt/BIGBASTA/jellyfin/TV:/shows
       - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+    devices:
+      - /dev/bus/usb:/dev/bus/usb/001
+      - /dev/bus/usb:/dev/bus/usb/002
+      - /dev/bus/usb:/dev/bus/usb/003
+      - /dev/bus/usb:/dev/bus/usb/004
+      - /dev/bus/usb:/dev/bus/usb/005
+      - /dev/bus/usb:/dev/bus/usb/006
+      - /dev/bus/usb:/dev/bus/usb/007
+
     restart: unless-stopped
 
   bazarr:
@@ -129,17 +138,3 @@ services:
     ports:
       - 8080:80
     restart: unless-stopped
-
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: proxy
-    restart: unless-stopped
-    ports:
-      - "80:80" # HTTP
-      - "81:81" # Web UI
-      - "443:443" # HTTPS
-    environment:
-      DB_SQLITE_FILE: "/data/database.sqlite"
-    volumes:
-      - /home/limbsjones/npm/data:/data
-      - /home/limbsjones/npm/letsencrypt:/etc/letsencrypt
