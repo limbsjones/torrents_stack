@@ -85,16 +85,7 @@ services:
     volumes:
       - /home/limbsjones/plex/config:/config
       - /mnt/BIGBASTA/jellyfin/TV:/shows
-      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
-    devices:
-      - /dev/bus/usb:/dev/bus/usb/001
-      - /dev/bus/usb:/dev/bus/usb/002
-      - /dev/bus/usb:/dev/bus/usb/003
-      - /dev/bus/usb:/dev/bus/usb/004
-      - /dev/bus/usb:/dev/bus/usb/005
-      - /dev/bus/usb:/dev/bus/usb/006
-      - /dev/bus/usb:/dev/bus/usb/007
-
+      - /mnt//wwn-0x5000c500b5c0c7aa-part2/jellyfin/Movies:/Movies
     restart: unless-stopped
 
   bazarr:
