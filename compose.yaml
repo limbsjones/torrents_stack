@@ -84,8 +84,8 @@ services:
       - PLEX_CLAIM=claim-vsoPvyeAwtrfxtXP49YR
     volumes:
       - /home/limbsjones/plex/config:/config
-      - /mnt/BIGBASTA/jellyfin/TV:/shows
-      - /mnt//wwn-0x5000c500b5c0c7aa-part2/jellyfin/Movies:/Movies
+      - /mnt/wwn-0x5000c500b5c0c7aa-part2/jellyfin/TV:/shows
+      - /mnt/wwn-0x5000c500b5c0c7aa-part2/jellyfin/Movies:/Movies
     restart: unless-stopped
 
   bazarr:
