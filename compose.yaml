@@ -48,6 +48,7 @@ services:
       - TZ=America/Toronto
     volumes:
       - /home/limbsjones/lidarr/config:/config
+      - /mnt/BIGBASTA/jellyfin/Music:/music
       - /mnt/BIGBASTA/torrents:/downloads
     ports:
       - 8686:8686
@@ -81,11 +82,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - VERSION=docker
-      - PLEX_CLAIM=claim-vsoPvyeAwtrfxtXP49YR
     volumes:
       - /home/limbsjones/plex/config:/config
-      - /mnt/wwn-0x5000c500b5c0c7aa-part2/jellyfin/TV:/shows
-      - /mnt/wwn-0x5000c500b5c0c7aa-part2/jellyfin/Movies:/Movies
+      - /mnt/BIGBASTA/jellyfin/TV:/shows
+      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
     restart: unless-stopped
 
   bazarr:
@@ -98,6 +98,7 @@ services:
     volumes:
       - /home/limbsjones/bazarr/config:/config
       - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+      - /mnt/BIGBASTA/jellyfin/TV:/tv
     ports:
       - 6767:6767
     restart: unless-stopped
