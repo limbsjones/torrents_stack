@@ -1,15 +1,17 @@
+# ArrStack - Stack media automatisée
+# Proxmox CT101 (Docker) ← Samba ← CT103 (Jellyfin)
 services:
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/sonarr/config:/config
-      - /mnt/BIGBASTA/jellyfin/TV/:/tv
-      - /mnt/BIGBASTA/torrents:/downloads
+      - /opt/arrstack/sonarr/config:/config
+      - /mnt/media/TV/:/tv
+      - /mnt/media/torrents:/downloads
     ports:
       - 8989:8989
     healthcheck:
@@ -17,19 +19,25 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    depends_on:
+      deluge:
+        condition: service_started
+    mem_limit: 512m
+    networks:
+      - arrnet
     restart: unless-stopped
 
   radarr:
     image: linuxserver/radarr
     container_name: radarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/radarr/config:/config
-      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
-      - /mnt/BIGBASTA/torrents:/downloads
+      - /opt/arrstack/radarr/config:/config
+      - /mnt/media/Movies:/Movies
+      - /mnt/media/torrents:/downloads
     ports:
       - 7878:7878
     healthcheck:
@@ -37,94 +45,132 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    depends_on:
+      deluge:
+        condition: service_started
+    mem_limit: 512m
+    networks:
+      - arrnet
     restart: unless-stopped
 
   lidarr:
     image: linuxserver/lidarr
     container_name: lidarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/lidarr/config:/config
-      - /mnt/BIGBASTA/jellyfin/Music:/music
-      - /mnt/BIGBASTA/torrents:/downloads
+      - /opt/arrstack/lidarr/config:/config
+      - /mnt/media/Music:/music
+      - /mnt/media/torrents:/downloads
     ports:
       - 8686:8686
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8686"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      deluge:
+        condition: service_started
+    mem_limit: 256m
+    networks:
+      - arrnet
     restart: unless-stopped
 
   deluge:
     image: linuxserver/deluge
-    container_name: deluge_stack
+    container_name: deluge
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - DELUGE_LOGLEVEL=error #optional
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DELUGE_LOGLEVEL=error
     volumes:
-      - /mnt/BIGBASTA/deluge:/config
-      - /mnt/BIGBASTA/torrents:/downloads
+      - /opt/arrstack/deluge/config:/config
+      - /mnt/media/torrents:/downloads
     ports:
       - 8112:8112
       - 6882:6882
       - 6881:6881/udp
-      - 58846:58846 #optional
-    restart: unless-stopped
-
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    ports:
-      - "32400:32400"
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - VERSION=docker
-    volumes:
-      - /home/limbsjones/plex/config:/config
-      - /mnt/BIGBASTA/jellyfin/TV:/shows
-      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
+      - 58846:58846
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8112"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 1g
+    networks:
+      - arrnet
     restart: unless-stopped
 
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/bazarr/config:/config
-      - /mnt/BIGBASTA/jellyfin/Movies:/Movies
-      - /mnt/BIGBASTA/jellyfin/TV:/tv
+      - /opt/arrstack/bazarr/config:/config
+      - /mnt/media/Movies:/Movies
+      - /mnt/media/TV:/tv
     ports:
       - 6767:6767
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6767"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 256m
+    networks:
+      - arrnet
     restart: unless-stopped
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/prowlarr/config:/config
+      - /opt/arrstack/prowlarr/config:/config
     ports:
       - 9696:9696
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 256m
+    networks:
+      - arrnet
     restart: unless-stopped
 
   heimdall:
     image: linuxserver/heimdall
     container_name: heimdall
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/limbsjones/heimdall/config:/config
+      - /opt/arrstack/heimdall/config:/config
     ports:
       - 8080:80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 128m
+    networks:
+      - arrnet
     restart: unless-stopped
+
+networks:
+  arrnet:
+    driver: bridge
+    name: arrnet
