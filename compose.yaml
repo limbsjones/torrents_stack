@@ -195,6 +195,46 @@ services:
       - arrnet
     restart: unless-stopped
 
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    environment:
+      - TZ=${TZ}
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=false
+      - WATCHTOWER_NOTIFICATIONS_HOSTNAME=arrstack
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    mem_limit: 64m
+    networks:
+      - arrnet
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    environment:
+      - N8N_HOST=10.0.0.70
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_SECURE_COOKIE=false
+      - N8N_PUBLIC_API_ENABLED=true
+      - WEBHOOK_URL=http://10.0.0.70:5678/
+      - TZ=${TZ}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    ports:
+      - 5678:5678
+    mem_limit: 512m
+    networks:
+      - arrnet
+    restart: unless-stopped
+
+volumes:
+  n8n_data:
+    external: true
+
 networks:
   arrnet:
     driver: bridge
