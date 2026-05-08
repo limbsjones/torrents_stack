@@ -211,6 +211,18 @@ services:
       - arrnet
     restart: unless-stopped
 
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+    ports:
+      - 8191:8191
+    mem_limit: 256m
+    networks:
+      - arrnet
+    restart: unless-stopped
+
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
     container_name: n8n
