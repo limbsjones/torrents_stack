@@ -1,133 +1,160 @@
-# 🎬 Self-Hosted Media Automation Stack
+# 🧩 ArrStack — Stack média automatisée
 
-A fully automated media server stack built with Docker Compose.  
-Automatically finds, downloads, organizes, and streams TV shows, movies, and music — with subtitles — all accessible via a sleek dashboard.
+Une stack Docker complète pour télécharger, organiser et streamer vos films, séries et musique — avec sous-titres et un dashboard centralisé.
 
----
-
-## 🧩 Included Containers
-
-| Service      | Purpose                           | Port            |
-| ------------ | --------------------------------- | --------------- |
-| **Prowlarr** | Indexer manager for \*Arr apps    | `9696`          |
-| **Sonarr**   | TV show management                | `8989`          |
-| **Radarr**   | Movie management                  | `7878`          |
-| **Lidarr**   | Music management                  | `8686`          |
-| **Bazarr**   | Subtitles automation              | `6767`          |
-| **Deluge**   | Torrent downloader                | `8112` (Web UI) |
-| **Plex**     | Media playback & streaming server | `32400`         |
-| **Heimdall** | Web dashboard for quick access    | `80`            |
+> **[CT101] Docker** ← Samba → **[CT103] Jellyfin** (serveur média séparé)
 
 ---
 
-## 🏗️ Folder Structure
+## 📦 Services
+
+| Service | Rôle | Port |
+|---|---|---|
+| **Prowlarr** | Gestionnaire d'indexeurs pour les \*Arr | `9696` |
+| **Sonarr** | Gestion des séries TV | `8989` |
+| **Radarr** | Gestion des films | `7878` |
+| **Lidarr** | Gestion de la musique | `8686` |
+| **Bazarr** | Téléchargement automatique de sous-titres | `6767` |
+| **Deluge** | Client torrent 🧲 | `8112` (Web UI) |
+| **Heimdall** | Tableau de bord web | `8080` |
+
+> 🎬 **Jellyfin** tourne sur un conteneur séparé (CT103) et accède aux médias via un partage Samba. Pas de Plex ici.
+
+---
+
+## 🏗️ Architecture
 
 ```
-.
-├── compose.yaml
-├── tv/                  # TV shows (Sonarr output)
-├── movies/              # Movies (Radarr output)
-├── music/               # Music (Lidarr output)
-├── downloads/           # Deluge downloads
-├── bazarr/config/
-├── deluge/config/
-├── heimdall/config/
-├── lidarr/config/
-├── plex/config/
-├── prowlarr/config/
-├── radarr/config/
-├── sonarr/config/
+┌─────────────────────────────────────────────────────┐
+│                Proxmox CT101 (Docker)               │
+│                                                     │
+│  [Heimdall] ──┬── [Prowlarr] ── indexeurs           │
+│               ├── [Sonarr]    ── TV (/mnt/media/TV) │
+│               ├── [Radarr]    ── Films (/mnt/media/Movies)
+│               ├── [Lidarr]    ── Musique            │
+│               ├── [Bazarr]    ── Sous-titres        │
+│               └── [Deluge]    ── ↓ torrents         │
+│                                  (/mnt/media/torrents)
+│                         │                           │
+│                    ┌────┘                           │
+│                    ▼ Samba mount                    │
+│            ┌──────────────────┐                     │
+│            │   CT103 Jellyfin  │                     │
+│            │   (serveur média) │                     │
+│            └──────────────────┘                     │
+└─────────────────────────────────────────────────────┘
 ```
 
-> All services share access to `/downloads`, `/tv`, `/movies`, and `/music` to coordinate file handling.
+### Volumes
+
+| Chemin hôte | Usage |
+|---|---|
+| `/opt/arrstack/` | Configurations persistantes de tous les services |
+| `/mnt/media/TV/` | Séries (sortie Sonarr) |
+| `/mnt/media/Movies/` | Films (sortie Radarr) |
+| `/mnt/media/Music/` | Musique (sortie Lidarr) |
+| `/mnt/media/torrents/` | Téléchargements Deluge |
+
+Tous les services partagent ces montures pour une coordination propre des fichiers.
 
 ---
 
-## 🚀 Getting Started
-
-1. **Clone the repo:**
-
-   ```bash
-   git clone https://github.com/limbsjones/torrents_stack
-   cd torrents_stack
-   ```
-
-2. **Start all containers:**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Access your dashboard:**
-
-   - [http://localhost](http://localhost) → Heimdall
-   - Or access each service directly via its port
-
----
-
-## 🛠️ First-Time Setup Checklist
-
-- [ ] Link Prowlarr to Sonarr, Radarr, Lidarr
-- [ ] Add working indexers (TorrentGalaxy, YTS, etc.)
-- [ ] Configure quality profiles and root folders
-- [ ] Connect Deluge to all \*Arr apps
-- [ ] Set up Plex libraries for `/tv`, `/movies`, `/music`
-- [ ] Add subtitle providers in Bazarr (e.g. OpenSubtitles, Subscene)
-- [ ] Customize Heimdall with links and logos
-
----
-
-## ✅ Features
-
-- 🎯 Automatic search and downloading of content
-- 🧠 Smart organization and renaming
-- 🎞️ Subtitles downloaded for movies and shows
-- 🧩 Unified dashboard with Heimdall
-- 📡 LAN-friendly, no cloud dependency
-- 📦 Fully Dockerized, portable setup
-
----
-
-## 🔐 Optional Add-Ons
-
-- 🔒 HTTPS with Traefik or Caddy
-- 🧳 Remote access via Tailscale or VPN
-- 🔑 Login protection via Authelia or Heimdall auth
-- 🎬 Add Bazarr for subtitles (already included)
-- 📥 Use private trackers with Prowlarr
-
----
-
-## 🧼 Maintenance
-
-**Stop the stack:**
+## 🚀 Démarrage
 
 ```bash
-docker-compose down
+# Cloner le dépôt
+git clone git@github.com:limbsjones/torrents_stack.git
+cd torrents_stack
+
+# Lancer la stack
+docker compose up -d
+
+# Accès rapide
+xdg-open http://localhost:8080   # Heimdall
+# ou chaque service directement sur son port
 ```
 
-**Stop and remove everything (⚠️ wipes data):**
+### Prérequis
+
+- Docker Engine 24+ et Docker Compose v2
+- Les points de montage `/mnt/media/` doivent exister et être accessibles
+- Optionnel : un partage Samba si les médias sont consommés par un autre hôte (CT103)
+
+---
+
+## 🔧 Configuration initiale
+
+- [ ] Connecter Prowlarr à Sonarr, Radarr et Lidarr
+- [ ] Ajouter des indexeurs (TorrentGalaxy, YTS, etc.)
+- [ ] Configurer les profils de qualité et dossiers racines
+- [ ] Lier Deluge aux \*Arr (catégories torrent, watch folders)
+- [ ] Ajouter des fournisseurs de sous-titres dans Bazarr (OpenSubtitles, etc.)
+- [ ] Personnaliser Heimdall (liens, icônes, fonds)
+- [ ] Configurer Jellyfin (CT103) pour pointer sur les dossiers Samba
+
+### Variables d'environnement
+
+Le fichier `.env` contient :
+
+```env
+PUID=1000
+PGID=1000
+TZ=America/Toronto
+```
+
+Ajustez `PUID`/`PGID` selon votre utilisateur Docker.
+
+---
+
+## ✨ Fonctionnalités
+
+- 🎯 Recherche et téléchargement automatiques
+- 🧠 Organisation et renommage intelligents (Sonarr/Radarr)
+- 🎞️ Sous-titres automatiques (Bazarr)
+- 🧩 Dashboard centralisé (Heimdall)
+- 📡 100% local, pas de dépendance cloud
+- 🐳 Entièrement Dockerisé, portable
+- ✅ Healthchecks sur tous les services
+
+---
+
+## 🧹 Maintenance
 
 ```bash
-docker-compose down -v
+# Arrêter la stack
+docker compose down
+
+# Arrêter + supprimer les volumes (⚠️ données perdues)
+docker compose down -v
+
+# Mettre à jour toutes les images
+docker compose pull
+docker compose up -d
+
+# Voir les logs en temps réel
+docker compose logs -f
 ```
 
 ---
 
-## 📚 Credits
+## 🔐 Bonus (optionnel)
 
-- [Sonarr](https://sonarr.tv/)
-- [Radarr](https://radarr.video/)
-- [Lidarr](https://lidarr.audio/)
-- [Bazarr](https://www.bazarr.media/)
-- [Deluge](https://deluge-torrent.org/)
-- [Plex](https://www.plex.tv/)
-- [Prowlarr](https://github.com/Prowlarr/Prowlarr)
-- [Heimdall](https://heimdall.site/)
-- Inspired by the r/selfhosted community
+- 🔒 HTTPS avec Traefik ou Caddy
+- 🧳 Accès distant via Tailscale
+- 🔑 Portail d'authentification (Authelia)
+- 📥 Trackers privés dans Prowlarr
 
 ---
 
-## 🧙 License
+## 📚 Crédits
 
-MIT — use freely, modify as needed.
+- [Sonarr](https://sonarr.tv) · [Radarr](https://radarr.video) · [Lidarr](https://lidarr.audio)
+- [Bazarr](https://www.bazarr.media) · [Deluge](https://deluge-torrent.org)
+- [Prowlarr](https://github.com/Prowlarr/Prowlarr) · [Heimdall](https://heimdall.site)
+- [linuxserver.io](https://linuxserver.io) — images Docker
+
+---
+
+## 📄 Licence
+
+MIT — faites ce que vous voulez.
