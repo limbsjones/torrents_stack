@@ -90,6 +90,7 @@ services:
     volumes:
       - /opt/arrstack/deluge/config:/config
       - /mnt/media/torrents:/downloads
+      - /opt/arrstack/deluge/custom-init:/custom-cont-init.d
     ports:
       - 8112:8112
       - 6882:6882
@@ -141,6 +142,30 @@ services:
       - 9696:9696
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    mem_limit: 256m
+    networks:
+      - arrnet
+    restart: unless-stopped
+
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /opt/arrstack/npm/data:/data
+      - /opt/arrstack/npm/letsencrypt:/etc/letsencrypt
+    ports:
+      - 80:80
+      - 81:81
+      - 443:443
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:81"]
       interval: 30s
       timeout: 10s
       retries: 3
