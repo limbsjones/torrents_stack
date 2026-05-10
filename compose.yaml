@@ -219,7 +219,7 @@ services:
       - LOG_LEVEL=info
     ports:
       - 8191:8191
-    mem_limit: 256m
+    mem_limit: 512m
     networks:
       - arrnet
     restart: unless-stopped
