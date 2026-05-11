@@ -95,9 +95,8 @@ services:
       - 8112:8112
       - 6882:6882
       - 6881:6881/udp
-      - 58846:58846
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8112"]
+      test: ["CMD", "curl", "-sS", "-o", "/dev/null", "http://localhost:8112"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -201,7 +200,6 @@ services:
     environment:
       - TZ=${TZ}
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_INCLUDE_STOPPED=true
       - WATCHTOWER_REVIVE_STOPPED=false
       - WATCHTOWER_NOTIFICATIONS_HOSTNAME=arrstack
       - DOCKER_API_VERSION=1.40
